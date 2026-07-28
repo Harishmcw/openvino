@@ -21,6 +21,11 @@ on:
         description: 'A string of options passed to CMake'
         type: string
         required: true
+      target-arch:                                    # <-- NEW
+        description: 'Target CPU architecture, e.g., "x86_64" or "arm64"'   # <-- NEW
+        type: string                                  # <-- NEW
+        required: false                                # <-- NEW
+        default: 'x86_64'                              # <-- NEW
       build-additional-python-wheels:
         description: 'Whether to build additional, i.e., non-system Python wheels. Should have Python 3.10-3.13 installed'
         type: boolean
@@ -49,7 +54,7 @@ jobs:
       CMAKE_BUILD_TYPE: ${{ inputs.build-type }}
       CMAKE_CXX_COMPILER_LAUNCHER: ${{ inputs.build-type != 'Debug' && 'ccache' || '' }}
       CMAKE_C_COMPILER_LAUNCHER: ${{ inputs.build-type != 'Debug' && 'ccache' || '' }}
-      CCACHE_REMOTE_DIR: "C:\\mount\\caches\\ccache\\windows${{ inputs.build-variant }}_x86_64_${{ inputs.build-type }}\\${{ inputs.target-branch }}"
+      CCACHE_REMOTE_DIR: "C:\\mount\\caches\\ccache\\windows${{ inputs.build-variant }}_${{ inputs.target-arch }}_${{ inputs.build-type }}\\${{ inputs.target-branch }}"
       CCACHE_DIR: ${{ github.workspace }}\\ccache
       CCACHE_MAXSIZE: 3G
       CCACHE_SLOPPINESS: pch_defines,time_macros
@@ -102,7 +107,7 @@ jobs:
             ${{ env.OPENVINO_REPO }}
             ${{ env.OPENVINO_CONTRIB_REPO }}
           product_type: ${{ env.PRODUCT_TYPE }}
-          target_arch: 'x86_64'
+          target_arch: ${{ inputs.target-arch }}
           build_type: ${{ inputs.build-type }}
           save_to: ${{ env.MANIFEST_PATH }}
           trigger_repo_branch: ${{ inputs.target-branch }}
@@ -159,6 +164,7 @@ jobs:
         uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1.13.0
         with:
           toolset: 14.42 # v2022
+          arch: ${{ inputs.target-arch == 'arm64' && 'arm64' || 'x64' }}
 
       - name: Set SSL_CERT_FILE for model downloading for unit tests
         run: echo SSL_CERT_FILE=$(python3 -m certifi) >> $env:GITHUB_ENV
