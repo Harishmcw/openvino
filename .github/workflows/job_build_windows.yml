@@ -90,7 +90,7 @@ jobs:
         uses: ./openvino/.github/actions/setup_python
         with:
           version: ${{ env.PYTHON_VERSION }}
-          use-pip-proxy: 'true'
+          use-pip-proxy: ${{ inputs.runner != 'windows-11-arm' }}
           self-hosted-runner: 'true'
 
       - name: Setup NodeJS
@@ -202,7 +202,7 @@ jobs:
         uses: ./openvino/.github/actions/setup_python
         with:
           version: '3.10'
-          use-pip-proxy: 'true'
+          use-pip-proxy: ${{ inputs.runner != 'windows-11-arm' }}
           set-pip-install-path: 'true'
           self-hosted-runner: 'true'
 
@@ -212,7 +212,7 @@ jobs:
         uses: ./openvino/.github/actions/setup_python
         with:
           version: '3.12'
-          use-pip-proxy: 'true'
+          use-pip-proxy: ${{ inputs.runner != 'windows-11-arm' }}
           set-pip-install-path: 'true'
           self-hosted-runner: 'true'
 
@@ -222,7 +222,7 @@ jobs:
         uses: ./openvino/.github/actions/setup_python
         with:
           version: '3.13'
-          use-pip-proxy: 'true'
+          use-pip-proxy: ${{ inputs.runner != 'windows-11-arm' }}
           set-pip-install-path: 'true'
           self-hosted-runner: 'true'
 
@@ -232,7 +232,7 @@ jobs:
         uses: ./openvino/.github/actions/setup_python
         with:
           version: '3.14'
-          use-pip-proxy: 'true'
+          use-pip-proxy: ${{ inputs.runner != 'windows-11-arm' }}
           set-pip-install-path: 'true'
           self-hosted-runner: 'true'
 
@@ -274,7 +274,7 @@ jobs:
         uses: ./openvino/.github/actions/setup_python
         with:
           version: '3.14t'
-          use-pip-proxy: 'true'
+          use-pip-proxy: ${{ inputs.runner != 'windows-11-arm' }}
           set-pip-install-path: 'true'
           self-hosted-runner: 'true'
           allow-prereleases: 'true'
@@ -344,7 +344,7 @@ jobs:
         uses: ./openvino/.github/actions/setup_python
         with:
           version: ${{ env.PYTHON_VERSION }}
-          use-pip-proxy: 'true'
+          use-pip-proxy: ${{ inputs.runner != 'windows-11-arm' }}
           set-pip-install-path: 'true'
           self-hosted-runner: 'true'
 
