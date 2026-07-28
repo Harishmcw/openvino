@@ -194,7 +194,7 @@ jobs:
         run: '& ccache --zero-stats'
 
       - name: Cmake build - OpenVINO
-        run: cmake --build ${{ env.BUILD_DIR }} --config ${{ env.CMAKE_BUILD_TYPE }} --parallel $ENV:NUMBER_OF_PROCESSORS -- --quiet
+        run: cmake --build ${{ env.BUILD_DIR }} --config ${{ env.CMAKE_BUILD_TYPE }} --parallel $ENV:NUMBER_OF_PROCESSORS -- --verbose
 
       - name: Show ccache stats
         if: ${{ inputs.build-type != 'Debug' && inputs.runner != 'windows-11-arm' }}
