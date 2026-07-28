@@ -176,6 +176,10 @@ jobs:
       - name: Set SSL_CERT_FILE for model downloading for unit tests
         run: echo SSL_CERT_FILE=$(python3 -m certifi) >> $env:GITHUB_ENV
 
+      - name: Install scons (required for ARM Compute Library build)
+        if: ${{ inputs.target-arch == 'arm64' }}
+        run: python3 -m pip install scons
+
       - name: CMake configure
         env:
           CMAKE_OPTIONS: ${{ inputs.cmake-options }}
