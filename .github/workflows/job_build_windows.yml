@@ -366,13 +366,13 @@ jobs:
           $ErrorActionPreference = "Stop"
           $log = Join-Path $env:GITHUB_WORKSPACE "build_log.txt"
 
-          cmake -UTBB* -S ${{ env.OPENVINO_REPO }} -B ${{ env.BUILD_DIR }} -DCPACK_GENERATOR=NPM -DENABLE_SYSTEM_TBB=OFF -DENABLE_WHEEL=OFF
+          cmake -UTBB* -S ${{ env.OPENVINO_REPO }} -B ${{ env.BUILD_DIR }} -DCPACK_GENERATOR=NPM -DENABLE_SYSTEM_TBB=OFF -DENABLE_WHEEL=OFF 2>&1 | Tee-Object -FilePath $log
           if ($LASTEXITCODE -ne 0) { throw "cmake configure failed with exit code $LASTEXITCODE" }
 
-          cmake --build ${{ env.BUILD_DIR }} --parallel $env:NUMBER_OF_PROCESSORS --verbose 2>&1 | Tee-Object -FilePath $log
+          cmake --build ${{ env.BUILD_DIR }} --parallel $env:NUMBER_OF_PROCESSORS --verbose 2>&1 | Tee-Object -FilePath $log -Append
           if ($LASTEXITCODE -ne 0) { throw "cmake build failed with exit code $LASTEXITCODE" }
 
-          cmake --install ${{ env.BUILD_DIR }} --config ${{ env.CMAKE_BUILD_TYPE }} --prefix ${{ env.INSTALL_DIR_JS }}
+          cmake --install ${{ env.BUILD_DIR }} --config ${{ env.CMAKE_BUILD_TYPE }} --prefix ${{ env.INSTALL_DIR_JS }} 2>&1 | Tee-Object -FilePath $log -Append
           if ($LASTEXITCODE -ne 0) { throw "cmake install failed with exit code $LASTEXITCODE" }
 
       - name: Upload build log
