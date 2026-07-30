@@ -52,8 +52,8 @@ jobs:
     runs-on: ${{ inputs.runner }}
     env:
       CMAKE_BUILD_TYPE: ${{ inputs.build-type }}
-      CMAKE_CXX_COMPILER_LAUNCHER: ${{ (inputs.build-type != 'Debug' && inputs.runner != 'windows-11-arm') && 'ccache' || '' }}
-      CMAKE_C_COMPILER_LAUNCHER: ${{ (inputs.build-type != 'Debug' && inputs.runner != 'windows-11-arm') && 'ccache' || '' }}
+      CMAKE_CXX_COMPILER_LAUNCHER: ${{ (inputs.build-type != 'Debug' && inputs.runner != 'self-hosted') && 'ccache' || '' }}
+      CMAKE_C_COMPILER_LAUNCHER: ${{ (inputs.build-type != 'Debug' && inputs.runner != 'self-hosted') && 'ccache' || '' }}
       CCACHE_REMOTE_DIR: "C:\\mount\\caches\\ccache\\windows${{ inputs.build-variant }}_${{ inputs.target-arch }}_${{ inputs.build-type }}\\${{ inputs.target-branch }}"
       CCACHE_DIR: ${{ github.workspace }}\\ccache
       CCACHE_MAXSIZE: 3G
@@ -90,7 +90,7 @@ jobs:
         uses: ./openvino/.github/actions/setup_python
         with:
           version: ${{ env.PYTHON_VERSION }}
-          use-pip-proxy: ${{ inputs.runner != 'windows-11-arm' }}
+          use-pip-proxy: ${{ inputs.runner != 'self-hosted' }}
           self-hosted-runner: 'true'
 
       - name: Setup NodeJS
@@ -150,7 +150,7 @@ jobs:
 
       - name: Setup ccache
         uses: ./openvino/.github/actions/cache
-        if: ${{ inputs.build-type != 'Debug' && inputs.runner != 'windows-11-arm' }}
+        if: ${{ inputs.build-type != 'Debug' && inputs.runner != 'self-hosted' }}
         with:
           save-always: ${{ github.event_name == 'push' && 'true' || 'false' }}
           cleanup-always: ${{ github.event_name == 'push' && 'true' || 'false' }}
@@ -190,14 +190,14 @@ jobs:
           Invoke-Expression $cmakeCommand
 
       - name: Clean ccache stats
-        if: ${{ inputs.build-type != 'Debug' && inputs.runner != 'windows-11-arm' }}
+        if: ${{ inputs.build-type != 'Debug' && inputs.runner != 'self-hosted' }}
         run: '& ccache --zero-stats'
 
       - name: Cmake build - OpenVINO
         run: cmake --build ${{ env.BUILD_DIR }} --config ${{ env.CMAKE_BUILD_TYPE }} --parallel $ENV:NUMBER_OF_PROCESSORS -- --verbose
 
       - name: Show ccache stats
-        if: ${{ inputs.build-type != 'Debug' && inputs.runner != 'windows-11-arm' }}
+        if: ${{ inputs.build-type != 'Debug' && inputs.runner != 'self-hosted' }}
         run: '& ccache --show-stats'
 
       - name: Cmake install - OpenVINO
@@ -213,7 +213,7 @@ jobs:
         uses: ./openvino/.github/actions/setup_python
         with:
           version: '3.10'
-          use-pip-proxy: ${{ inputs.runner != 'windows-11-arm' }}
+          use-pip-proxy: ${{ inputs.runner != 'self-hosted' }}
           set-pip-install-path: 'true'
           self-hosted-runner: 'true'
 
@@ -223,7 +223,7 @@ jobs:
         uses: ./openvino/.github/actions/setup_python
         with:
           version: '3.12'
-          use-pip-proxy: ${{ inputs.runner != 'windows-11-arm' }}
+          use-pip-proxy: ${{ inputs.runner != 'self-hosted' }}
           set-pip-install-path: 'true'
           self-hosted-runner: 'true'
 
@@ -233,7 +233,7 @@ jobs:
         uses: ./openvino/.github/actions/setup_python
         with:
           version: '3.13'
-          use-pip-proxy: ${{ inputs.runner != 'windows-11-arm' }}
+          use-pip-proxy: ${{ inputs.runner != 'self-hosted' }}
           set-pip-install-path: 'true'
           self-hosted-runner: 'true'
 
@@ -243,7 +243,7 @@ jobs:
         uses: ./openvino/.github/actions/setup_python
         with:
           version: '3.14'
-          use-pip-proxy: ${{ inputs.runner != 'windows-11-arm' }}
+          use-pip-proxy: ${{ inputs.runner != 'self-hosted' }}
           set-pip-install-path: 'true'
           self-hosted-runner: 'true'
 
@@ -285,7 +285,7 @@ jobs:
         uses: ./openvino/.github/actions/setup_python
         with:
           version: '3.14t'
-          use-pip-proxy: ${{ inputs.runner != 'windows-11-arm' }}
+          use-pip-proxy: ${{ inputs.runner != 'self-hosted' }}
           set-pip-install-path: 'true'
           self-hosted-runner: 'true'
           allow-prereleases: 'true'
@@ -355,7 +355,7 @@ jobs:
         uses: ./openvino/.github/actions/setup_python
         with:
           version: ${{ env.PYTHON_VERSION }}
-          use-pip-proxy: ${{ inputs.runner != 'windows-11-arm' }}
+          use-pip-proxy: ${{ inputs.runner != 'self-hosted' }}
           set-pip-install-path: 'true'
           self-hosted-runner: 'true'
 

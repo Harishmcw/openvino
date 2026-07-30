@@ -80,7 +80,7 @@ jobs:
         uses: ./.github/actions/setup_python
         with:
           version: ${{ inputs.python-version }}
-          use-pip-proxy: ${{ inputs.runner != 'windows-11-arm' }}
+          use-pip-proxy: ${{ inputs.runner != 'self-hosted' }}
           set-pip-install-path: ${{ runner.os != 'macOS' }}
           self-hosted-runner: ${{ runner.os != 'macOS' }}
 
