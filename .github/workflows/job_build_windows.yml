@@ -361,20 +361,27 @@ jobs:
 
       - name: CMake configure, build and install - OpenVINO JS API
         if: ${{ fromJSON(inputs.affected-components).JS_API }}
+        shell: pwsh
         run: |
-          cmake -UTBB* -S ${{ env.OPENVINO_REPO }} -B ${{ env.BUILD_DIR }} `
-                -DCPACK_GENERATOR=NPM `
-                -DENABLE_SYSTEM_TBB=OFF `
-                -DENABLE_WHEEL=OFF
-          cmake --build ${{ env.BUILD_DIR }} --parallel $ENV:NUMBER_OF_PROCESSORS --verbose 2>&1 | Tee-Object -FilePath build_log.txt
+          $ErrorActionPreference = "Stop"
+          $log = Join-Path $env:GITHUB_WORKSPACE "build_log.txt"
+
+          cmake -UTBB* -S ${{ env.OPENVINO_REPO }} -B ${{ env.BUILD_DIR }} -DCPACK_GENERATOR=NPM -DENABLE_SYSTEM_TBB=OFF -DENABLE_WHEEL=OFF
+          if ($LASTEXITCODE -ne 0) { throw "cmake configure failed with exit code $LASTEXITCODE" }
+
+          cmake --build ${{ env.BUILD_DIR }} --parallel $env:NUMBER_OF_PROCESSORS --verbose 2>&1 | Tee-Object -FilePath $log
+          if ($LASTEXITCODE -ne 0) { throw "cmake build failed with exit code $LASTEXITCODE" }
+
           cmake --install ${{ env.BUILD_DIR }} --config ${{ env.CMAKE_BUILD_TYPE }} --prefix ${{ env.INSTALL_DIR_JS }}
+          if ($LASTEXITCODE -ne 0) { throw "cmake install failed with exit code $LASTEXITCODE" }
 
       - name: Upload build log
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: openvino-build-log
-          path: build_log.txt
+          path: ${{ github.workspace }}/build_log.txt
+          if-no-files-found: warn
 
       - name: Pack JS Artifacts
         if: ${{ fromJSON(inputs.affected-components).JS_API }}
