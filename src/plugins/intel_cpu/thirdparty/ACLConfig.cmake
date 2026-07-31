@@ -131,7 +131,7 @@ elseif(NOT TARGET arm_compute::arm_compute)
     # Initial Setup
     # ==========================================================================
 
-    set(ARM_COMPUTE_SCONS_JOBS "8" CACHE STRING "Number of parallel threads to build ARM Compute Library")
+    set(ARM_COMPUTE_SCONS_JOBS "1" CACHE STRING "Number of parallel threads to build ARM Compute Library")
     set(ARM_COMPUTE_SOURCE_DIR "${intel_cpu_thirdparty_SOURCE_DIR}/ComputeLibrary")
 
     message(STATUS "Configure to build ${ARM_COMPUTE_SOURCE_DIR}")
