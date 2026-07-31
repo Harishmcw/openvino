@@ -365,8 +365,12 @@ jobs:
         run: |
           $ErrorActionPreference = "Stop"
           $log = Join-Path $env:GITHUB_WORKSPACE "build_log.txt"
+          Write-Host "Log will be written to: $log"
+          Write-Host "Current directory: $(Get-Location)"
+          Write-Host "GITHUB_WORKSPACE: $env:GITHUB_WORKSPACE"
 
           cmake -UTBB* -S ${{ env.OPENVINO_REPO }} -B ${{ env.BUILD_DIR }} -DCPACK_GENERATOR=NPM -DENABLE_SYSTEM_TBB=OFF -DENABLE_WHEEL=OFF 2>&1 | Tee-Object -FilePath $log
+          Write-Host "After configure, file exists: $(Test-Path $log)"
           if ($LASTEXITCODE -ne 0) { throw "cmake configure failed with exit code $LASTEXITCODE" }
 
           cmake --build ${{ env.BUILD_DIR }} --parallel $env:NUMBER_OF_PROCESSORS --verbose 2>&1 | Tee-Object -FilePath $log -Append
@@ -374,6 +378,13 @@ jobs:
 
           cmake --install ${{ env.BUILD_DIR }} --config ${{ env.CMAKE_BUILD_TYPE }} --prefix ${{ env.INSTALL_DIR_JS }} 2>&1 | Tee-Object -FilePath $log -Append
           if ($LASTEXITCODE -ne 0) { throw "cmake install failed with exit code $LASTEXITCODE" }
+
+      - name: Debug - list workspace
+        if: always()
+        shell: pwsh
+        run: |
+          Write-Host "Listing GITHUB_WORKSPACE:"
+          Get-ChildItem $env:GITHUB_WORKSPACE | Select-Object Name, Length
 
       - name: Upload build log
         if: always()
