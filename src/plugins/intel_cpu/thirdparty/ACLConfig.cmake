@@ -302,6 +302,7 @@ elseif(NOT TARGET arm_compute::arm_compute)
                     set(local_extra_cc_flags "${local_extra_cc_flags} /MD")
                 endif()
             endif()
+            set(local_extra_link_flags "${local_extra_link_flags} /SUBSYSTEM:CONSOLE")
         endif()
 
         # LTO configuration

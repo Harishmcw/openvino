@@ -373,6 +373,8 @@ jobs:
           Write-Host "After configure, file exists: $(Test-Path $log)"
           if ($LASTEXITCODE -ne 0) { throw "cmake configure failed with exit code $LASTEXITCODE" }
 
+          cmake --build C:\ov_build --target arm_compute_build --parallel $env:NUMBER_OF_PROCESSORS --verbose
+          
           cmake --build ${{ env.BUILD_DIR }} --parallel $env:NUMBER_OF_PROCESSORS --verbose 2>&1 | Tee-Object -FilePath $log -Append
           if ($LASTEXITCODE -ne 0) { throw "cmake build failed with exit code $LASTEXITCODE" }
 
