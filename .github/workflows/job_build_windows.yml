@@ -194,7 +194,16 @@ jobs:
         run: '& ccache --zero-stats'
 
       - name: Cmake build - OpenVINO
-        run: cmake --build ${{ env.BUILD_DIR }} --config ${{ env.CMAKE_BUILD_TYPE }} --parallel $ENV:NUMBER_OF_PROCESSORS -- --verbose
+          cmake --build C:\ov_build --target arm_compute_build --parallel $env:NUMBER_OF_PROCESSORS --verbose 2>&1 | Tee-Object -FilePath build_log.txt
+
+          cmake --build ${{ env.BUILD_DIR }} --parallel $env:NUMBER_OF_PROCESSORS --verbose 2>&1 | Tee-Object -FilePath build_log.txt
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: openvino-build-log
+          path: build_log.txt
 
       - name: Show ccache stats
         if: ${{ inputs.build-type != 'Debug' && inputs.runner != 'windows-11-arm' }}
@@ -400,10 +409,11 @@ jobs:
           cmake -DCUSTOM_OPERATIONS="calculate_grid;complex_mul;fft;grid_sample;sparse_conv;sparse_conv_transpose" -S ${{ env.OPENVINO_REPO }} -B ${{ env.BUILD_DIR }} `
                 -DOPENVINO_EXTRA_MODULES="${{ env.OPENVINO_CONTRIB_REPO }}/modules/custom_operations;${{ env.OPENVINO_CONTRIB_REPO }}/modules/java_api" `
                 -DENABLE_WHEEL=OFF
+          cmake --build ${{ env.BUILD_DIR }} --parallel $ENV:NUMBER_OF_PROCESSORS -- --quiet
 
-          cmake --build C:\ov_build --target arm_compute_build --parallel $env:NUMBER_OF_PROCESSORS --verbose 2>&1 | Tee-Object -FilePath build_log.txt
-          
-          cmake --build ${{ env.BUILD_DIR }} --parallel $env:NUMBER_OF_PROCESSORS --verbose 2>&1 | Tee-Object -FilePath build_log.txt
+      #
+      # Upload build artifacts and logs
+      #
 
       - name: Upload build log
         if: always()
