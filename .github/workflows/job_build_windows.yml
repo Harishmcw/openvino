@@ -119,26 +119,6 @@ jobs:
       - name: System info
         uses: ./openvino/.github/actions/system_info
 
-#
-      # Build ARM Compute Library (Windows ARM64)
-      #
-
-      #- name: Clone ARM Compute Library (win_arm64 fork)
-       # if: ${{ inputs.target-arch == 'arm64' }}
-        #uses: ababushk/checkout@dd591a6a2ac25618db4eda86e7e0d938f88cf01b # cherry_pick_retries
-        #timeout-minutes: 15
-        #with:
-         # repository: 'Harishmcw/ComputeLibrary'
-          #ref: 'fix_scons_woa_ci_build'
-          #path: 'ComputeLibrary'
-
-      #- name: Build ARM Compute Library (Win ARM64)
-       # if: ${{ inputs.target-arch == 'arm64' }}
-        #working-directory: ${{ github.workspace }}\ComputeLibrary
-        #run: |
-         # python3 -m pip install scons
-          #scons -j4 os=windows arch=arm64-v8a build=native neon=1 opencl=0 embed_kernels=1 debug=0 Werror=0
-
       #
       # Dependencies
       #
@@ -215,8 +195,8 @@ jobs:
 
       - name: Cmake build - OpenVINO
         run: |
-          cmake --build ${{ env.BUILD_DIR }} --target arm_compute_build --parallel $env:NUMBER_OF_PROCESSORS --verbose 2>&1 | Tee-Object -FilePath build_log.txt
-      #cmake --build ${{ env.BUILD_DIR }} --config ${{ env.CMAKE_BUILD_TYPE }} --parallel $ENV:NUMBER_OF_PROCESSORS --verbose 2>&1 | Tee-Object -FilePath build_log.txt
+          cmake --build ${{ env.BUILD_DIR }} --target arm_compute_build --parallel $env:NUMBER_OF_PROCESSORS
+          cmake --build ${{ env.BUILD_DIR }} --config ${{ env.CMAKE_BUILD_TYPE }} --parallel $ENV:NUMBER_OF_PROCESSORS --verbose 2>&1 | Tee-Object -FilePath build_log.txt
 
       - name: Upload build log
         if: always()
