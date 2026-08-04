@@ -194,17 +194,7 @@ jobs:
         run: '& ccache --zero-stats'
 
       - name: Cmake build - OpenVINO
-        run: |
-          cmake --build ${{ env.BUILD_DIR }} --target arm_compute_build --parallel $env:NUMBER_OF_PROCESSORS
-          cmake --build ${{ env.BUILD_DIR }} --config ${{ env.CMAKE_BUILD_TYPE }} --parallel $ENV:NUMBER_OF_PROCESSORS --verbose 2>&1 | Tee-Object -FilePath build_log.txt
-
-      - name: Upload build log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: openvino-build-log
-          path: build_log.txt
-
+        run: cmake --build ${{ env.BUILD_DIR }} --config ${{ env.CMAKE_BUILD_TYPE }} --parallel $ENV:NUMBER_OF_PROCESSORS -- --quiet
       - name: Show ccache stats
         if: ${{ inputs.build-type != 'Debug' && inputs.runner != 'windows-11-arm' }}
         run: '& ccache --show-stats'
@@ -218,7 +208,7 @@ jobs:
 
       # Setup additional Python versions for wheels building
       - name: Setup Python 3.10
-        if: ${{ inputs.build-additional-python-wheels }}
+        if: ${{ inputs.build-additional-python-wheels && inputs.runner != 'windows-11-arm' }}
         uses: ./openvino/.github/actions/setup_python
         with:
           version: '3.10'
@@ -259,7 +249,7 @@ jobs:
       - name: Build additional Python wheels
         if: ${{ inputs.build-additional-python-wheels }}
         run: |
-          $pyVersions = '3.10', '3.11', '3.12', '3.13', '3.14'
+          $pyVersions = if ('${{ inputs.runner }}' -eq 'windows-11-arm') { '3.11', '3.12', '3.13', '3.14' } else { '3.10', '3.11', '3.12', '3.13', '3.14' }
           foreach ($pyVersion in $pyVersions) {
             $pyBuildDir = "${{ github.workspace }}/py$pyVersion"
             New-Item -ItemType Directory -Path "$pyBuildDir" -Force
@@ -410,17 +400,6 @@ jobs:
                 -DOPENVINO_EXTRA_MODULES="${{ env.OPENVINO_CONTRIB_REPO }}/modules/custom_operations;${{ env.OPENVINO_CONTRIB_REPO }}/modules/java_api" `
                 -DENABLE_WHEEL=OFF
           cmake --build ${{ env.BUILD_DIR }} --parallel $ENV:NUMBER_OF_PROCESSORS -- --quiet
-
-      #
-      # Upload build artifacts and logs
-      #
-
-      - name: Upload build log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: openvino-build-log
-          path: build_log.txt
 
       #
       # Upload build artifacts and logs
