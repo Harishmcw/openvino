@@ -142,7 +142,7 @@ jobs:
           version: ${{ env.PYTHON_VERSION }}
           set-pip-install-path: 'false'
           self-hosted-runner: 'true'
-          use-pip-proxy: 'true'
+          use-pip-proxy: 'false'
 
       # Test with the short names of the arguments
       - name: Build cpp samples
@@ -341,7 +341,7 @@ jobs:
         uses: ./openvino/.github/actions/setup_python
         with:
           version: ${{ env.PYTHON_VERSION }}
-          use-pip-proxy: 'true'
+          use-pip-proxy: 'false'
           set-pip-install-path: 'true'
           self-hosted-runner: 'true'
 
@@ -484,7 +484,7 @@ jobs:
         uses: ./openvino/.github/actions/setup_python
         with:
           version: ${{ matrix.python-version }}
-          use-pip-proxy: 'true'
+          use-pip-proxy: 'false'
           set-pip-install-path: 'false'
           self-hosted-runner: 'true'
 
@@ -627,7 +627,7 @@ jobs:
           version: ${{ env.PYTHON_VERSION }}
           set-pip-install-path: 'false'
           self-hosted-runner: 'true'
-          use-pip-proxy: 'true'
+          use-pip-proxy: 'false'
 
       - name: Install python dependencies
         run: python3 -m pip install -r ${{ github.workspace }}\install\tests\functional_test_utils\layer_tests_summary\requirements.txt

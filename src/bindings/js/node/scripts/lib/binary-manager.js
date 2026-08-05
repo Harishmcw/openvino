@@ -161,7 +161,7 @@ class BinaryManager {
     if (!["arm64", "x64"].includes(arch))
       missleadings.push(`Architecture '${arch}' is not supported.`);
 
-    if (platform === "win32" && arch !== "x64")
+    if (platform === "win32" && !["x64", "arm64"].includes(arch))
       missleadings.push(`Version for windows and '${arch}' is not supported.`);
 
     if (platform === "darwin" && arch !== "arm64")
