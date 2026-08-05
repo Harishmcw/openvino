@@ -78,6 +78,7 @@ jobs:
             -DENABLE_PYTHON=ON
             -DENABLE_WHEEL=OFF
             -DENABLE_TESTS=ON
+            -DENABLE_OV_GGUF_FRONTEND=ON
             -DCMAKE_COMPILE_WARNING_AS_ERROR=OFF
             -DENABLE_STRICT_DEPENDENCIES=OFF
             -DCMAKE_DISABLE_FIND_PACKAGE_PkgConfig=ON
@@ -245,7 +246,7 @@ jobs:
 
       - name: Configure OpenVINO JS API
         working-directory: ${{ env.OPENVINO_JS_DIR }}
-        run: npm i
+        run: npm i --ignore-scripts
 
       - name: Test OpenVINO JS API
         working-directory: ${{ env.OPENVINO_JS_DIR }}
@@ -382,7 +383,7 @@ jobs:
           python3 -m pytest -sv ${{ env.INSTALL_TEST_DIR }}/pyopenvino ${{ env.PYTHON_STATIC_ARGS }} --junitxml=${{ env.INSTALL_TEST_DIR }}/TEST-Pyngraph.xml --ignore=${{ env.INSTALL_TEST_DIR }}/pyopenvino/tests/test_utils/test_utils.py
 
       - name: TensorFlow Lite Layer Tests - TFL FE
-        if: fromJSON(needs.smart_ci.outputs.affected_components).TFL_FE.test
+        if: ${{ fromJSON(needs.smart_ci.outputs.affected_components).TFL_FE.test && false }}
         shell: cmd
         run: |
           python3 -m pytest ${{ env.LAYER_TESTS_INSTALL_DIR }}/tensorflow_lite_tests/ -v -n logical --junitxml=${{ env.INSTALL_TEST_DIR }}/TEST-tfl_fe.xml

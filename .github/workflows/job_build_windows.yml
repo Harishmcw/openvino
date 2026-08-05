@@ -364,6 +364,7 @@ jobs:
           cmake -UTBB* -S ${{ env.OPENVINO_REPO }} -B ${{ env.BUILD_DIR }} `
                 -DCPACK_GENERATOR=NPM `
                 -DENABLE_SYSTEM_TBB=OFF `
+                -DENABLE_JS=ON `
                 -DENABLE_WHEEL=OFF
           cmake --build ${{ env.BUILD_DIR }} --parallel $ENV:NUMBER_OF_PROCESSORS -- --quiet
           cmake --install ${{ env.BUILD_DIR }} --config ${{ env.CMAKE_BUILD_TYPE }} --prefix ${{ env.INSTALL_DIR_JS }}
@@ -382,7 +383,7 @@ jobs:
       - name: Pack openvino_node_npm_package
         if: ${{ fromJSON(inputs.affected-components).JS_API }}
         run: |
-          npm i
+          npm i --ignore-scripts
           npm pack
           $file1 = Get-ChildItem -Path . -Filter bin
           $file2 = Get-ChildItem -Path . -Filter openvino-node-*
