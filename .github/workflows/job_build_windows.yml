@@ -150,7 +150,7 @@ jobs:
 
       - name: Setup ccache
         uses: ./openvino/.github/actions/cache
-        if: ${{ inputs.build-type != 'Debug' && inputs.runner != 'windows-11-arm' }}
+        if: ${{ inputs.build-type != 'Debug' }}
         with:
           save-always: ${{ github.event_name == 'push' && 'true' || 'false' }}
           cleanup-always: ${{ github.event_name == 'push' && 'true' || 'false' }}
