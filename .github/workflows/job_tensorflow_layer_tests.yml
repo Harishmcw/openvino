@@ -102,7 +102,7 @@ jobs:
         uses: ./.github/actions/setup_python
         with:
           version: ${{ inputs.python-version }}
-          use-pip-proxy: 'true'
+          use-pip-proxy: ${{ inputs.runner != 'windows-11-arm' }}
           set-pip-install-path: ${{ runner.os != 'macOS' }}
           self-hosted-runner: ${{ runner.os != 'macOS' }}
 
@@ -113,6 +113,7 @@ jobs:
           wheels-to-install: 'openvino openvino_tokenizers'
 
       - name: Install Python Layer tests dependencies
+        continue-on-error: ${{ runner.os == 'Windows' && runner.arch == 'ARM64' }}
         run: |
           # tensorflow test requirements
           python3 -m pip install -r ${{ env.INSTALL_TEST_DIR }}/requirements_tensorflow

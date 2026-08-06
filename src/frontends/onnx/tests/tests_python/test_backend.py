@@ -887,23 +887,6 @@ if platform.system() == 'Linux' and platform.machine() in ['arm', 'armv7l', 'aar
         ]
     )
 
-if platform.system() == 'Windows' and platform.machine() in ['arm', 'armv7l', 'aarch64', 'arm64', 'ARM64']:
-    tests_expected_to_fail.extend(
-        [
-            (xfail_issue_38091, "OnnxBackendNodeModelTest.test_reduce_log_sum_empty_set_cpu"),
-            (xfail_issue_38091, "OnnxBackendNodeModelTest.test_reduce_log_sum_empty_set_expanded_cpu"),
-            (xfail_issue_38091, "OnnxBackendNodeModelTest.test_reduce_log_sum_exp_empty_set_cpu"),
-            (xfail_issue_38091, "OnnxBackendNodeModelTest.test_resize_downsample_scales_nearest_cpu"),
-            (xfail_issue_38091, "OnnxBackendNodeModelTest.test_resize_downsample_sizes_nearest_cpu"),
-            (xfail_issue_38091, "OnnxBackendNodeModelTest.test_resize_upsample_sizes_nearest_axes_2_3_cpu"),
-            (xfail_issue_38091, "OnnxBackendNodeModelTest.test_resize_upsample_sizes_nearest_axes_3_2_cpu"),
-            (xfail_issue_38091, "OnnxBackendNodeModelTest.test_resize_upsample_sizes_nearest_cpu"),
-            (xfail_issue_38091, "OnnxBackendNodeModelTest.test_softplus_cpu"),
-            (xfail_issue_38091, "OnnxBackendNodeModelTest.test_softplus_expanded_ver18_cpu"),
-            (xfail_issue_38091, "OnnxBackendPyTorchConvertedModelTest.test_Softplus_cpu"),
-        ]
-    )
-
 for test_group in tests_expected_to_fail:
     for test_case in test_group[1:]:
         expect_fail(f"{test_case}", test_group[0])

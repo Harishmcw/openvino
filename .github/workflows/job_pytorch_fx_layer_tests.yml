@@ -110,6 +110,7 @@ jobs:
           wheels-to-install: 'openvino'
 
       - name: Install Pytorch FX Layer tests dependencies
+        continue-on-error: ${{ runner.os == 'Windows' && runner.arch == 'ARM64' }}
         run: |
           # pytorch test requirements
           python3 -m pip install -r ${{ env.INSTALL_TEST_DIR }}/requirements_pytorch

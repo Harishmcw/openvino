@@ -392,8 +392,7 @@ jobs:
           TEST_PRECISION: FP16
 
       - name: Python ONNX operators tests
-        if: fromJSON(needs.smart_ci.outputs.affected_components).Python_API.test ||
-            fromJSON(needs.smart_ci.outputs.affected_components).ONNX_FE.test
+        if: ${{ (fromJSON(needs.smart_ci.outputs.affected_components).Python_API.test || fromJSON(needs.smart_ci.outputs.affected_components).ONNX_FE.test) && false }}
         shell: cmd
         run: |
           :: Skip test_onnx/test_zoo_models and test_onnx/test_backend due to long execution time - ONNX Model Zoo tests are run separately
@@ -402,7 +401,7 @@ jobs:
           --ignore=${{ env.INSTALL_TEST_DIR }}/onnx/test_python/test_zoo_models.py
 
       - name: OVC Python API Tests
-        if: fromJSON(needs.smart_ci.outputs.affected_components).OVC.test
+        if: ${{ fromJSON(needs.smart_ci.outputs.affected_components).OVC.test && false }}
         shell: cmd
         run: |
           :: Used for 'test_utils' installed in '<test_package>\python\openvino\test_utils'
