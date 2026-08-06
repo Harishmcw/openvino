@@ -52,8 +52,8 @@ jobs:
     runs-on: ${{ inputs.runner }}
     env:
       CMAKE_BUILD_TYPE: ${{ inputs.build-type }}
-      CMAKE_CXX_COMPILER_LAUNCHER: ${{ (inputs.build-type != 'Debug' && inputs.runner != 'windows-11-arm') && 'ccache' || '' }}
-      CMAKE_C_COMPILER_LAUNCHER: ${{ (inputs.build-type != 'Debug' && inputs.runner != 'windows-11-arm') && 'ccache' || '' }}
+      CMAKE_CXX_COMPILER_LAUNCHER: ${{ inputs.build-type != 'Debug' && 'ccache' || '' }}
+      CMAKE_C_COMPILER_LAUNCHER: ${{ inputs.build-type != 'Debug' && 'ccache' || '' }}
       CCACHE_REMOTE_DIR: "C:\\mount\\caches\\ccache\\windows${{ inputs.build-variant }}_${{ inputs.target-arch }}_${{ inputs.build-type }}\\${{ inputs.target-branch }}"
       CCACHE_DIR: ${{ github.workspace }}\\ccache
       CCACHE_MAXSIZE: 3G
@@ -148,13 +148,10 @@ jobs:
       # Build
       #
 
-      - name: Setup ccache
-        uses: ./openvino/.github/actions/cache
+      - name: Restore ccache
         if: ${{ inputs.build-type != 'Debug' }}
+        uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
-          save-always: ${{ github.event_name == 'push' && 'true' || 'false' }}
-          cleanup-always: ${{ github.event_name == 'push' && 'true' || 'false' }}
-          cache-path: ${{ env.CCACHE_REMOTE_DIR }}
           path: ${{ env.CCACHE_DIR }}
           key: ${{ runner.os }}-${{ runner.arch }}-ccache-${{ github.sha }}
           restore-keys: |
@@ -203,9 +200,17 @@ jobs:
 
       - name: Cmake build - OpenVINO
         run: cmake --build ${{ env.BUILD_DIR }} --config ${{ env.CMAKE_BUILD_TYPE }} --parallel $ENV:NUMBER_OF_PROCESSORS -- --quiet
+
       - name: Show ccache stats
         if: ${{ inputs.build-type != 'Debug' }}
         run: '& ccache --show-stats'
+
+      - name: Save ccache
+        if: ${{ inputs.build-type != 'Debug' && always() }}
+        uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: ${{ runner.os }}-${{ runner.arch }}-ccache-${{ github.sha }}
 
       - name: Cmake install - OpenVINO
         run: |

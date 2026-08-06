@@ -108,8 +108,16 @@ jobs:
           wheels-dir-path: ${{ env.INSTALL_DIR }}
           wheels-to-install: 'openvino'
 
+      - name: Setup MSVC dev environment
+        if: ${{ runner.os == 'Windows' && runner.arch == 'ARM64' }}
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: arm64
+
       - name: Install JAX Layer tests dependencies
-        continue-on-error: ${{ runner.os == 'Windows' && runner.arch == 'ARM64' }}
+        env:
+          CC: cl
+          CXX: cl
         run: |
           # jax test requirements
           python3 -m pip install -r ${{ env.INSTALL_TEST_DIR }}/requirements_jax

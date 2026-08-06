@@ -113,7 +113,8 @@ jobs:
           wheels-to-install: 'openvino openvino_tokenizers'
 
       - name: Install Python Layer tests dependencies
-        continue-on-error: ${{ runner.os == 'Windows' && runner.arch == 'ARM64' }}
+        # Disabled on Windows ARM64 because TensorFlow wheel is not available on PyPI for WOA
+        if: ${{ !(runner.os == 'Windows' && runner.arch == 'ARM64') }}
         run: |
           # tensorflow test requirements
           python3 -m pip install -r ${{ env.INSTALL_TEST_DIR }}/requirements_tensorflow

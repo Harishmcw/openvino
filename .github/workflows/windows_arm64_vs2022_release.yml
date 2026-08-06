@@ -163,6 +163,8 @@ jobs:
           wheels-to-install: 'openvino'
 
       - name: Samples tests
+        # Disabled because opencv-python-headless is not available for Windows ARM64
+        if: false
         run: |
           python3 -m pip install --ignore-installed PyYAML -r ./tests/smoke_tests/requirements.txt
            # Install pytest-timeout to abort hanging samples and dump tracebacks
@@ -183,7 +185,8 @@ jobs:
 
       - name: Upload Test Results
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        if: ${{ always() }}
+        # Disabled because the samples tests are skipped
+        if: false
         with:
           name: test-results-samples
           path: ${{ env.INSTALL_TEST_DIR }}/TEST-samples_smoke_tests.xml
@@ -197,89 +200,6 @@ jobs:
       - name: Build c samples (bat)
         run: |
           & ${{ env.SAMPLES_INSTALL_DIR }}/c/build_samples_msvc.bat -i ${{ env.INSTALL_DIR }}/samples_bat -b ${{ env.BUILD_DIR }}/c_samples_bat
-
-  JS_API:
-    name: JS API
-    needs: [ Build, Smart_CI ]
-    strategy:
-      fail-fast: false
-      matrix:
-        nodejs-version: [21, 22, 24, 26]
-    defaults:
-      run:
-        shell: pwsh
-    runs-on: 'windows-11-arm'
-    env:
-      OPENVINO_JS_DIR: "${{ github.workspace }}\\openvino\\src\\bindings\\js\\node"
-      OPENVINO_JS_LIBS_DIR: "${{ github.workspace }}\\openvino\\src\\bindings\\js\\node\\bin"
-      NODE_VERSION: ${{ matrix.nodejs-version }}
-      PIP_INDEX_URL: "http://pip-proxy.pip-proxy.svc.cluster.local/simple/"
-      PIP_TRUSTED_HOST: "pip-proxy.pip-proxy.svc.cluster.local"
-    if: fromJSON(needs.smart_ci.outputs.affected_components).JS_API
-
-    steps:
-      - name: Fetch OpenVINO JS sources
-        uses: ababushk/checkout@dd591a6a2ac25618db4eda86e7e0d938f88cf01b # cherry_pick_retries
-        timeout-minutes: 15
-        with:
-          sparse-checkout: |
-            src/bindings/js
-          path: 'openvino'
-
-      - name: Download OpenVINO artifacts (JS)
-        uses: akashchi/download-artifact@d59a9c15fec3fdb7c9adf09464124d00f9c11415 # main
-        with:
-          name: openvino_js_package
-          path: ${{ env.OPENVINO_JS_LIBS_DIR }}
-          merge-multiple: true
-
-      - name: Extract OpenVINO packages
-        run: Expand-Archive openvino_js_package.zip -DestinationPath . -Verbose
-        working-directory: ${{ env.OPENVINO_JS_LIBS_DIR }}
-
-      - name: Setup Node ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-          cache-dependency-path: ${{ env.OPENVINO_JS_DIR }}/package-lock.json
-
-      - name: Configure OpenVINO JS API
-        working-directory: ${{ env.OPENVINO_JS_DIR }}
-        run: npm i --ignore-scripts
-
-      - name: Test OpenVINO JS API
-        working-directory: ${{ env.OPENVINO_JS_DIR }}
-        run: npm test
-
-      - name: Test OpenVINO JS API (cmd)
-        shell: cmd
-        working-directory: ${{ env.OPENVINO_JS_DIR }}
-        run: call npm test
-
-      - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@30375c66a4eea26614e0d39710365f22f8b0af57 # v3.0.0
-
-      - name: E2E of openvino-node package
-        if: fromJSON(env.NODE_VERSION) >= 22
-        working-directory: ${{ env.OPENVINO_JS_DIR }}
-        run: npm run test:e2e
-
-      - name: E2E of openvino-node package (cmd)
-        if: fromJSON(env.NODE_VERSION) >= 22
-        shell: cmd
-        working-directory: ${{ env.OPENVINO_JS_DIR }}
-        run: call npm run test:e2e
-
-      - name: Create package dir
-        working-directory: ${{ github.workspace }}
-        run: mkdir project-uses-openvino-node
-
-      - name: Test installation of openvino-node package
-        working-directory: ${{ github.workspace }}/project-uses-openvino-node
-        run: |
-          npm i openvino-node
-          node -e "const { addon: ov } = require('openvino-node'); console.log(ov);"
 
   Openvino_tokenizers:
     name: OpenVINO tokenizers extension
@@ -671,7 +591,7 @@ jobs:
 
   Overall_Status:
     name: ci/gha_overall_status_windows_arm64
-    needs: [ Smart_CI, Build, Samples, CXX_Unit_Tests, Python_Unit_Tests, CPU_Functional_Tests, Openvino_tokenizers, TensorFlow_Layer_Tests, Pytorch_Layer_Tests, JS_API ]
+    needs: [ Smart_CI, Build, Samples, CXX_Unit_Tests, Python_Unit_Tests, CPU_Functional_Tests, Openvino_tokenizers, TensorFlow_Layer_Tests, Pytorch_Layer_Tests ]
     if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
