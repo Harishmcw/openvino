@@ -180,6 +180,14 @@ jobs:
         if: ${{ inputs.target-arch == 'arm64' }}
         run: python3 -m pip install scons
 
+      - name: Install ccache (Windows ARM64)
+        if: ${{ runner.os == 'Windows' && runner.arch == 'ARM64' }}
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          install: true
+          save: false
+          restore: false
+
       - name: CMake configure
         env:
           CMAKE_OPTIONS: ${{ inputs.cmake-options }}
