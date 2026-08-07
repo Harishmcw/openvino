@@ -252,9 +252,12 @@ jobs:
 
       - name: OV utils unit tests
         if: ${{ runner.os != 'macOS' }} # Ticket: 134469
+        env:
+          # skip flaky short/long path mismatch on Win ARM64
+          GTEST_FILTER: ${{ (runner.os == 'Windows' && runner.arch == 'ARM64') && '--gtest_filter=-SanitizePathTest.valid_nested_relative_path' || '' }}
         run: |
           ${{ env.SOURCE_COMMAND }} ${{ env.SETUPVARS }}
-          ${{ env.INSTALL_TEST_DIR }}/ov_util_tests --gtest_print_time=1 --gtest_output=xml:${{ env.INSTALL_TEST_DIR }}/TEST-ov_util_tests.xml
+          ${{ env.INSTALL_TEST_DIR }}/ov_util_tests --gtest_print_time=1 --gtest_output=xml:${{ env.INSTALL_TEST_DIR }}/TEST-ov_util_tests.xml ${{ env.GTEST_FILTER }}
 
       - name: OpenVINO C API tests
         if: ${{ fromJSON(inputs.affected-components).C_API.test }}
