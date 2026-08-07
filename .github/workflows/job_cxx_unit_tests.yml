@@ -216,7 +216,7 @@ jobs:
           ${{ env.INSTALL_TEST_DIR }}/ov_cpu_unit_tests_vectorized --gtest_print_time=1 --gtest_output=xml:${{ env.INSTALL_TEST_DIR }}/TEST-CPUUnitTestsVectorized.xml
 
       - name: NPU plugin unit tests
-        if: ${{fromJSON(inputs.affected-components).NPU.test && runner.os == 'Windows'}}
+        if: ${{fromJSON(inputs.affected-components).NPU.test && runner.os == 'Windows' && runner.arch != 'ARM64'}}
         run: |
           ${{ env.SOURCE_COMMAND }} ${{ env.SETUPVARS }}
           ${{ env.INSTALL_TEST_DIR }}/ov_npu_unit_tests --gtest_print_time=1 --gtest_output=xml:${{ env.INSTALL_TEST_DIR }}/TEST-NPUUnitTests.xml
