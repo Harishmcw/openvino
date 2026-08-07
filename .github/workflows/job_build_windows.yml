@@ -52,12 +52,10 @@ jobs:
     runs-on: ${{ inputs.runner }}
     env:
       CMAKE_BUILD_TYPE: ${{ inputs.build-type }}
-      CACHE_TOOL: ${{ inputs.target-arch == 'arm64' && 'sccache' || 'ccache' }}
-      CMAKE_CXX_COMPILER_LAUNCHER: ${{ inputs.build-type != 'Debug' && (inputs.target-arch == 'arm64' && 'sccache' || 'ccache') || '' }}
-      CMAKE_C_COMPILER_LAUNCHER: ${{ inputs.build-type != 'Debug' && (inputs.target-arch == 'arm64' && 'sccache' || 'ccache') || '' }}
+      CMAKE_CXX_COMPILER_LAUNCHER: ${{ inputs.build-type != 'Debug' && 'ccache' || '' }}
+      CMAKE_C_COMPILER_LAUNCHER: ${{ inputs.build-type != 'Debug' && 'ccache' || '' }}
       CCACHE_REMOTE_DIR: "C:\\mount\\caches\\ccache\\windows${{ inputs.build-variant }}_${{ inputs.target-arch }}_${{ inputs.build-type }}\\${{ inputs.target-branch }}"
       CCACHE_DIR: ${{ github.workspace }}\\ccache
-      SCCACHE_DIR: ${{ github.workspace }}\\ccache
       CCACHE_MAXSIZE: 3G
       CCACHE_SLOPPINESS: pch_defines,time_macros
       OPENVINO_REPO: "${{ github.workspace }}\\openvino"
@@ -183,7 +181,7 @@ jobs:
         if: ${{ runner.os == 'Windows' && runner.arch == 'ARM64' }}
         uses: hendrikmuhs/ccache-action@v1.2
         with:
-          variant: sccache
+          install: true
           save: false
           restore: false
 
@@ -198,14 +196,14 @@ jobs:
 
       - name: Clean ccache stats
         if: ${{ inputs.build-type != 'Debug' }}
-        run: '& $env:CACHE_TOOL --zero-stats'
+        run: '& ccache --zero-stats'
 
       - name: Cmake build - OpenVINO
         run: cmake --build ${{ env.BUILD_DIR }} --config ${{ env.CMAKE_BUILD_TYPE }} --parallel $ENV:NUMBER_OF_PROCESSORS -- --quiet
 
       - name: Show ccache stats
         if: ${{ inputs.build-type != 'Debug' }}
-        run: '& $env:CACHE_TOOL --show-stats'
+        run: '& ccache --show-stats'
 
       - name: Save ccache
         if: ${{ inputs.build-type != 'Debug' && always() }}

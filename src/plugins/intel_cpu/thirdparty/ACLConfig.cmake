@@ -414,7 +414,7 @@ elseif(NOT TARGET arm_compute::arm_compute)
     endif()
 
     # Compiler cache
-    if(CMAKE_CXX_COMPILER_LAUNCHER)
+    if(CMAKE_CXX_COMPILER_LAUNCHER AND NOT (WIN32 AND CMAKE_SYSTEM_PROCESSOR MATCHES "ARM64|arm64"))
         ov_arm_compute_add_option("compiler_cache" "${CMAKE_CXX_COMPILER_LAUNCHER}")
     endif()
 
