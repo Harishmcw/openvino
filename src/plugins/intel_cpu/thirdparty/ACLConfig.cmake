@@ -133,6 +133,24 @@ elseif(NOT TARGET arm_compute::arm_compute)
 
     set(ARM_COMPUTE_SCONS_JOBS "8" CACHE STRING "Number of parallel threads to build ARM Compute Library")
     set(ARM_COMPUTE_SOURCE_DIR "${intel_cpu_thirdparty_SOURCE_DIR}/ComputeLibrary")
+    
+    if(WIN32 AND CMAKE_SYSTEM_PROCESSOR MATCHES "ARM64|arm64")
+        set(ACL_PATCH_FILE "${intel_cpu_thirdparty_SOURCE_DIR}/patches/acl_win_arm64.patch")
+        if(EXISTS ${ACL_PATCH_FILE})
+            execute_process(COMMAND git apply --reverse --check --ignore-whitespace ${ACL_PATCH_FILE}
+                            WORKING_DIRECTORY ${ARM_COMPUTE_SOURCE_DIR}
+                            RESULT_VARIABLE patch_already_applied OUTPUT_QUIET ERROR_QUIET)
+            if(NOT patch_already_applied EQUAL 0)
+                message(STATUS "Applying ACL patch: ${ACL_PATCH_FILE}")
+                execute_process(COMMAND git apply --ignore-whitespace ${ACL_PATCH_FILE}
+                                WORKING_DIRECTORY ${ARM_COMPUTE_SOURCE_DIR}
+                                RESULT_VARIABLE apply_result)
+                if(NOT apply_result EQUAL 0)
+                    message(FATAL_ERROR "Failed to apply ACL patch. Please check if the patch is valid.")
+                endif()
+            endif()
+        endif()
+    endif()
 
     message(STATUS "Configure to build ${ARM_COMPUTE_SOURCE_DIR}")
 
