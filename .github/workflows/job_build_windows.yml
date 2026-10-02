@@ -54,7 +54,7 @@ env:
 
 jobs:
   Build:
-    timeout-minutes: 300
+    timeout-minutes: ${{ inputs.target-arch == 'arm64' && 300 || 180 }}
     defaults:
       run:
         shell: pwsh
@@ -158,7 +158,7 @@ jobs:
 
       - name: Install scons (required for ARM Compute Library build)
         if: ${{ inputs.target-arch == 'arm64' }}
-        run: python3 -m pip install scons
+        run: python3 -m pip install scons==4.11.1
 
       #
       # Build
@@ -190,6 +190,7 @@ jobs:
         uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1.13.0
         with:
           arch: arm64
+          toolset: "14.44" # v2022
 
       - name: Configure Developer Command Prompt for Microsoft Visual C++
         uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1.13.0
